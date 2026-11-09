@@ -1,7 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 146 64" role="img" aria-label="rsh logo">
 <title>rsh</title>
-<path d="M 53.25 26.31 A 22 22 0 1 1 37.69 10.75" fill="none" stroke="#221F1C" stroke-width="5" stroke-linecap="round"/>
-<polyline points="20.8,24.2 28.6,31.7 20.8,39.2" fill="none" stroke="#221F1C" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
-<line x1="33.2" y1="39.2" x2="43.0" y2="39.2" stroke="#221F1C" stroke-width="5" stroke-linecap="round"/>
-<text x="80" y="40.2" font-family="'JetBrains Mono','IBM Plex Mono',Menlo,Consolas,monospace" font-size="29" font-weight="600" fill="#221F1C">rsh</text>
+<path d="M 53.25 26.31 A 22 22 0 1 1 37.69 10.75" fill="none" stroke="#000000" stroke-width="4" stroke-linecap="round"/>
+<polyline points="20.8,24.2 28.6,31.7 20.8,39.2" fill="none" stroke="#000000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<line x1="33.2" y1="39.2" x2="43.0" y2="39.2" stroke="#000000" stroke-width="4" stroke-linecap="round"/>
+<text x="80" y="40.2" font-family="'JetBrains Mono','IBM Plex Mono',Menlo,Consolas,monospace" font-size="29" font-weight="600" fill="#000000">rsh</text>
 </svg>

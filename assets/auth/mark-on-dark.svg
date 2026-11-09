@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="auth mark">
 <title>auth</title>
-<path d="M 53.25 26.31 A 22 22 0 1 1 37.69 10.75" fill="none" stroke="#FAF7F2" stroke-width="5" stroke-linecap="round"/>
-<circle cx="32" cy="26.4" r="5.1" fill="none" stroke="#FAF7F2" stroke-width="5"/>
-<line x1="32" y1="29.6" x2="32" y2="41.4" stroke="#FAF7F2" stroke-width="5" stroke-linecap="round"/>
+<path d="M 53.25 26.31 A 22 22 0 1 1 37.69 10.75" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+<circle cx="32" cy="25.2" r="6.2" fill="none" stroke="#FFFFFF" stroke-width="4"/>
+<line x1="32" y1="30.4" x2="32" y2="41.6" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
 </svg>
