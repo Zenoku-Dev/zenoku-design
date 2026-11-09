@@ -60,9 +60,9 @@ assets/<product>/
 - Светлая тема / чёрный текст → `mark.svg` / `logo.svg`
 - Иконки приложений и favicons → `png/` или `app-icon.svg` / `favicon.svg`
 - Шапка README → `readme-banner.svg` / `readme-banner-dark.svg` (готовые PNG в `png/readme-banner*.png`)
-- Словесный знак набран JetBrains Mono SemiBold, строчные
+- Словесный знак — собственные кривые (производные от Brigends Expanded Regular, Multype Studio), визуально капс; файл шрифта в репо не входит
 
-SVG самодостаточны (кроме `<text>` в `logo*.svg` — нужен JetBrains Mono или фолбэк-моно).
+SVG полностью самодостаточны: wordmark — это кривые (paths), шрифт для рендера не нужен.
 
 ## Пересборка
 

@@ -8,6 +8,12 @@ PNG-экспорт — scripts/render.sh (нужен rsvg-convert).
 import math
 import os
 
+from fontTools.ttLib import TTFont
+from fontTools.pens.svgPathPen import SVGPathPen
+from fontTools.pens.transformPen import TransformPen
+
+BRIGENDS_PATH = os.path.expanduser("~/intemp/font.otf")  # Brigends Expanded Regular (Multype Studio)
+
 C = 32  # центр сетки 64×64
 R = 22  # радиус общей дуги / кольца
 SW = 4  # толщина штриха
@@ -59,6 +65,53 @@ GLYPHS = {
 
 NAMES = {"zenoku": "zenoku", "zeno": "zeno", "zent": "zent", "rsh": "rsh", "auth": "auth"}
 
+_FONT = None
+
+
+def _font():
+    global _FONT
+    if _FONT is None:
+        _FONT = TTFont(BRIGENDS_PATH)
+    return _FONT
+
+
+def text_to_path(text, x, baseline, em, fill):
+    f = _font()
+    upem = f["head"].unitsPerEm
+    scale = em / upem
+    cmap = f.getBestCmap()
+    hmtx = f["hmtx"]
+    glyph_set = f.getGlyphSet()
+    parts = []
+    cx = x
+    track = em * 0.03  # трекинг wordmark
+    for ch in text:
+        name = cmap.get(ord(ch))
+        if name is None:
+            cx += (upem // 3) * scale + track
+            continue
+        pen = SVGPathPen(glyph_set)
+        tpen = TransformPen(pen, (scale, 0, 0, -scale, cx, baseline))
+        glyph_set[name].draw(tpen)
+        d = pen.getCommands()
+        if d:
+            parts.append(d)
+        cx += hmtx[name][0] * scale + track
+    # стилизация: мягкое расширение штрихом в цвет заливки — углы получают
+    # собственное скругление (правка исходных кривых, а не «шрифт как есть»)
+    sw = round(em * 0.022, 2)
+    return (f'<path d="{" ".join(parts)}" fill="{fill}" stroke="{fill}" '
+            f'stroke-width="{sw}" stroke-linejoin="round" stroke-linecap="round"/>',
+            cx - x - track)
+
+
+def x_height_ratio():
+    f = _font()
+    os2 = f.get("OS/2")
+    if os2 is not None and getattr(os2, "sxHeight", 0):
+        return os2.sxHeight / f["head"].unitsPerEm
+    return 0.5
+
 # README-баннер: иконка слева, название крупно справа в одну строку.
 BANNER_H = 512
 BANNER_PAD = 48
@@ -79,10 +132,11 @@ def mark_svg(product, fg):
 
 def logo_svg(product, fg, text_color):
     name = NAMES[product]
-    font_size = 29
-    advance = round(font_size * 0.6, 2)  # JetBrains Mono advance = 0.6em
+    em = 29
     text_x = 80
-    width = int(text_x + advance * len(name) + 14)
+    baseline = round(32 + em * x_height_ratio() / 2, 1)
+    wordmark, advance = text_to_path(name, text_x, baseline, em, text_color)
+    width = int(text_x + advance + 16)
     if product == "zenoku":
         body = full_ring(fg) + "\n" + dot(fg)
     else:
@@ -90,7 +144,7 @@ def logo_svg(product, fg, text_color):
     return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} 64" role="img" aria-label="{name} logo">
 <title>{name}</title>
 {body}
-<text x="{text_x}" y="40.2" font-family="'JetBrains Mono','IBM Plex Mono',Menlo,Consolas,monospace" font-size="{font_size}" font-weight="600" fill="{text_color}">{name}</text>
+{wordmark}
 </svg>
 '''
 
@@ -134,17 +188,18 @@ def banner_svg(product, variant):
     else:
         tile, glyph, text = PAPER, INK, PAPER
     name = NAMES[product]
-    width = int(BANNER_TEXT_X + BANNER_GAP * len(name) + BANNER_PAD)
     tile_c = BANNER_PAD + BANNER_TILE / 2
     glyph_scale = BANNER_TILE / 64 * 0.775
-    baseline = BANNER_H / 2 + BANNER_EM * 0.36
+    baseline = round(BANNER_H / 2 + BANNER_EM * x_height_ratio() / 2, 1)
+    wordmark, advance = text_to_path(name, BANNER_TEXT_X, baseline, BANNER_EM, text)
+    width = int(BANNER_TEXT_X + advance + BANNER_PAD)
     return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {BANNER_H}" role="img" aria-label="{name} banner">
 <title>{name}</title>
 <rect x="{BANNER_PAD}" y="{BANNER_PAD}" width="{BANNER_TILE}" height="{BANNER_TILE}" rx="93" fill="{tile}"/>
 <g transform="translate({tile_c} {tile_c}) scale({glyph_scale:.4f}) translate(-32 -32)">
 {_icon_body(product, glyph)}
 </g>
-<text x="{BANNER_TEXT_X}" y="{baseline:.1f}" font-family="'JetBrains Mono','IBM Plex Mono',Menlo,Consolas,monospace" font-size="{BANNER_EM}" font-weight="600" fill="{text}">{name}</text>
+{wordmark}
 </svg>
 '''
 
