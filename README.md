@@ -2,8 +2,8 @@
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="assets/zenoku/readme-banner-dark.svg">
-    <img src="assets/zenoku/readme-banner.svg" alt="zenoku" width="480">
+    <source media="(prefers-color-scheme: dark)" srcset="assets/zenoku/readme-banner-animated-dark.svg">
+    <img src="assets/zenoku/readme-banner-animated.svg" alt="zenoku" width="480">
   </picture>
 </p>
 
@@ -42,7 +42,11 @@ assets/<product>/
 ├── favicon.svg        # favicon: чёрный тайл 64×64
 ├── readme-banner.svg  # README-шапка: иконка слева, имя крупно (светлая тема)
 ├── readme-banner-dark.svg  # то же для тёмной темы
+├── readme-banner-animated.svg  # анимированная шапка: знак дорисовывается за ~1.5 с
+├── readme-banner-animated-dark.svg  # то же для тёмной темы
 └── png/               # экспорт: mark 512/1024, logo 1600, icon 512/1024, favicon 16…512, readme-banner
+assets/motion/
+└── sting-*.mp4        # стинги знака: 1080×1080, 30 fps (zenoku, zeno, zent, rsh, auth, family)
 ```
 
 продукты: `zenoku`, `zeno`, `zent`, `rsh`, `auth`.
@@ -59,7 +63,8 @@ assets/<product>/
 - Тёмная тема / светлый текст → `mark-on-dark.svg` / `logo-dark.svg`
 - Светлая тема / чёрный текст → `mark.svg` / `logo.svg`
 - Иконки приложений и favicons → `png/` или `app-icon.svg` / `favicon.svg`
-- Шапка README → `readme-banner.svg` / `readme-banner-dark.svg` (готовые PNG в `png/readme-banner*.png`)
+- Шапка README → `readme-banner.svg` / `readme-banner-dark.svg` (готовые PNG в `png/readme-banner*.png`); анимированная версия — `readme-banner-animated.svg` / `readme-banner-animated-dark.svg`
+- MP4-стинги знака (для соцсетей и релизов) → `assets/motion/`
 - Словесный знак — собственные кривые (производные от Brigends Expanded Regular, Multype Studio), визуально капс; файл шрифта в репо не входит
 
 SVG полностью самодостаточны: wordmark — это кривые (paths), шрифт для рендера не нужен.
@@ -67,7 +72,9 @@ SVG полностью самодостаточны: wordmark — это кри�
 ## Пересборка
 
 ```sh
-./scripts/render.sh   # python3 + rsvg-convert; пересобирает SVG и все PNG
+./scripts/render.sh          # python3 + rsvg-convert; пересобирает SVG и все PNG
+python3 scripts/generate_motion.py   # анимированные README-баннеры
+python3 scripts/render_sting.py      # MP4-стинги в assets/motion/ (rsvg-convert + ffmpeg)
 ```
 
 ## Авторство и лицензия
@@ -77,3 +84,6 @@ SVG полностью самодостаточны: wordmark — это кри�
 Бренд-дирекшн выведен методом «direction → passes» из
 [unslop](https://github.com/heydamir/unslop) Дамира Соколовского ([@heydamir](https://x.com/heydamir)),
 CC BY 4.0 — отсылка, а не копирование текста.
+Моушн-правила (draw-on для линейных знаков, один приём на знак, длительности и easing) —
+из [motion-design-skills](https://github.com/iart-ai/motion-design-skills) (iart-ai, MIT):
+`logo-animation`, `animation-principles`, `motion-art-direction`.
