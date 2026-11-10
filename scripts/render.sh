@@ -5,7 +5,7 @@ cd "$(dirname "$0")/.."
 
 python3 scripts/generate_svg.py
 
-for p in zenoku zeno zent rsh auth; do
+for p in zenoku zeno zent rsh auth zenoku-dev; do
   d="assets/$p"
   mkdir -p "$d/png"
   rsvg-convert -w 512  "$d/mark.svg"    -o "$d/png/mark-512.png"
@@ -20,4 +20,13 @@ for p in zenoku zeno zent rsh auth; do
     rsvg-convert -w "$s" "$d/favicon.svg" -o "$d/png/favicon-$s.png"
   done
 done
-echo "png ok"
+
+# зазеркалить все PNG в ~/intemp/zenoku-design/<продукт>/ (drop-папка)
+OUT="${ZED_OUT:-$HOME/intemp/zenoku-design}"
+rm -rf "$OUT"
+for p in zenoku zeno zent rsh auth zenoku-dev; do
+  mkdir -p "$OUT/$p"
+  cp "assets/$p/png/"*.png "$OUT/$p/"
+done
+cp assets/preview.png "$OUT/"
+echo "png ok → $OUT"

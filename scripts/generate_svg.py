@@ -15,8 +15,9 @@ from fontTools.pens.transformPen import TransformPen
 BRIGENDS_PATH = os.path.expanduser("~/intemp/font.otf")  # Brigends Expanded Regular (Multype Studio)
 
 C = 32  # центр сетки 64×64
-R = 22  # радиус общей дуги / кольца
-SW = 4  # толщина штриха
+R = 19  # радиус общей дуги / кольца
+SW = 3.2  # толщина штриха
+GS = 0.76  # масштаб глифа относительно сетки (inset, защита от наслоения на дугу)
 
 INK = "#000000"     # чистый чёрный
 PAPER = "#FFFFFF"   # чистый белый
@@ -44,7 +45,13 @@ def full_ring(color):
 
 
 def dot(color):
-    return f'<circle cx="{C}" cy="{C}" r="4.4" fill="{color}"/>'
+    return f'<circle cx="{C}" cy="{C}" r="4.0" fill="{color}"/>'
+
+
+def _inner(product, fg):
+    # дуга общая (не масштабируется), глиф сжат к центру — без наслоения
+    body = arc(fg) + "\n" + f'<g transform="translate(32 32) scale({GS}) translate(-32 -32)">\n{GLYPHS[product](fg, fg)}\n</g>'
+    return body
 
 
 GLYPHS = {
@@ -53,17 +60,22 @@ GLYPHS = {
     # zent — конверт (почта): корпус + клапан-«галка»
     "zent": lambda ink, accent: f'''<rect x="16.5" y="23.5" width="31" height="17.5" rx="3.4" fill="none" stroke="{ink}" stroke-width="{SW}"/>
 <polyline points="19,26.6 32,35.8 45,26.6" fill="none" stroke="{ink}" stroke-width="{SW}" stroke-linecap="round" stroke-linejoin="round"/>''',
-    # auth — замочная скважина (единая авторизация): круг + стержень
-    "auth": lambda ink, accent: f'''<circle cx="32" cy="25.2" r="6.2" fill="none" stroke="{ink}" stroke-width="{SW}"/>
-<line x1="32" y1="30.4" x2="32" y2="41.6" stroke="{ink}" stroke-width="{SW}" stroke-linecap="round"/>''',
+    # auth — замочная скважина (единая авторизация): круг + расходящиеся линии (слои)
+    "auth": lambda ink, accent: f'''<circle cx="32" cy="24.9" r="5.7" fill="none" stroke="{ink}" stroke-width="{SW}"/>
+<line x1="29.5" y1="28.15" x2="27.25" y2="40.9" stroke="{ink}" stroke-width="{SW}" stroke-linecap="round"/>
+<line x1="34.5" y1="28.15" x2="36.75" y2="40.9" stroke="{ink}" stroke-width="{SW}" stroke-linecap="round"/>''',
     # rsh — приглашение терминала (>_)
     "rsh": lambda ink, accent: f'''<polyline points="20.8,24.2 28.6,31.7 20.8,39.2" fill="none" stroke="{ink}" stroke-width="{SW}" stroke-linecap="round" stroke-linejoin="round"/>
 <line x1="33.2" y1="39.2" x2="43.0" y2="39.2" stroke="{ink}" stroke-width="{SW}" stroke-linecap="round"/>''',
     # zenoku — кольцо + точка (целое и точка отсчёта)
     "zenoku": lambda ink, accent: full_ring(ink) + "\n" + dot(accent),
+    # zenoku-dev — организация: дуга + </> (код zenoku), слэш в стороне от скобок
+    "zenoku-dev": lambda ink, accent: f'''<polyline points="25.2,22.8 18.4,31.75 25.2,40.7" fill="none" stroke="{ink}" stroke-width="{SW}" stroke-linecap="round" stroke-linejoin="round"/>
+<polyline points="38.8,22.8 45.6,31.75 38.8,40.7" fill="none" stroke="{ink}" stroke-width="{SW}" stroke-linecap="round" stroke-linejoin="round"/>
+<line x1="34.6" y1="22.5" x2="29.4" y2="41.0" stroke="{ink}" stroke-width="{SW}" stroke-linecap="round"/>''',
 }
 
-NAMES = {"zenoku": "zenoku", "zeno": "zeno", "zent": "zent", "rsh": "rsh", "auth": "auth"}
+NAMES = {"zenoku": "zenoku", "zeno": "zeno", "zent": "zent", "rsh": "rsh", "auth": "auth", "zenoku-dev": "zenoku-dev"}
 
 _FONT = None
 
@@ -125,7 +137,7 @@ def mark_svg(product, fg):
     glyph = GLYPHS[product](fg, fg)
     return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="{NAMES[product]} mark">
 <title>{NAMES[product]}</title>
-{glyph if product == "zenoku" else arc(fg) + chr(10) + glyph}
+{full_ring(fg) + chr(10) + dot(fg) if product == "zenoku" else _inner(product, fg)}
 </svg>
 '''
 
@@ -140,7 +152,7 @@ def logo_svg(product, fg, text_color):
     if product == "zenoku":
         body = full_ring(fg) + "\n" + dot(fg)
     else:
-        body = arc(fg) + "\n" + GLYPHS[product](fg, fg)
+        body = _inner(product, fg)
     return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} 64" role="img" aria-label="{name} logo">
 <title>{name}</title>
 {body}
@@ -154,7 +166,7 @@ def app_icon_svg(product, tile, glyph_color):
     return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="{NAMES[product]} app icon">
 <title>{NAMES[product]} app icon</title>
 <rect width="1024" height="1024" rx="229" fill="{tile}"/>
-<g transform="translate(512 512) scale(12.4) translate(-32 -32)">
+<g transform="translate(512 512) scale(10.8) translate(-32 -32)">
 {body}
 </g>
 </svg>
@@ -165,7 +177,7 @@ def favicon_svg(product):
     if product == "zenoku":
         body = full_ring(PAPER) + "\n" + dot(PAPER)
     else:
-        body = arc(PAPER) + "\n" + GLYPHS[product](PAPER, PAPER)
+        body = _inner(product, PAPER)
     return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="{NAMES[product]} favicon">
 <title>{NAMES[product]}</title>
 <rect width="64" height="64" rx="14.3" fill="{INK}"/>
@@ -177,7 +189,7 @@ def favicon_svg(product):
 def _icon_body(product, glyph_color):
     if product == "zenoku":
         return full_ring(glyph_color) + "\n" + dot(glyph_color)
-    return arc(glyph_color) + "\n" + GLYPHS[product](glyph_color, glyph_color)
+    return _inner(product, glyph_color)
 
 
 def banner_svg(product, variant):
@@ -189,7 +201,7 @@ def banner_svg(product, variant):
         tile, glyph, text = PAPER, INK, PAPER
     name = NAMES[product]
     tile_c = BANNER_PAD + BANNER_TILE / 2
-    glyph_scale = BANNER_TILE / 64 * 0.775
+    glyph_scale = BANNER_TILE / 64 * 0.70
     baseline = round(BANNER_H / 2 + BANNER_EM * x_height_ratio() / 2, 1)
     wordmark, advance = text_to_path(name, BANNER_TEXT_X, baseline, BANNER_EM, text)
     width = int(BANNER_TEXT_X + advance + BANNER_PAD)

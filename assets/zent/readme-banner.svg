@@ -1,10 +1,12 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1575 512" role="img" aria-label="zent banner">
 <title>zent</title>
 <rect x="48" y="48" width="416" height="416" rx="93" fill="#000000"/>
-<g transform="translate(256.0 256.0) scale(5.0375) translate(-32 -32)">
-<path d="M 53.25 26.31 A 22 22 0 1 1 37.69 10.75" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
-<rect x="16.5" y="23.5" width="31" height="17.5" rx="3.4" fill="none" stroke="#FFFFFF" stroke-width="4"/>
-<polyline points="19,26.6 32,35.8 45,26.6" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(256.0 256.0) scale(4.5500) translate(-32 -32)">
+<path d="M 50.35 27.08 A 19 19 0 1 1 36.92 13.65" fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round"/>
+<g transform="translate(32 32) scale(0.76) translate(-32 -32)">
+<rect x="16.5" y="23.5" width="31" height="17.5" rx="3.4" fill="none" stroke="#FFFFFF" stroke-width="3.2"/>
+<polyline points="19,26.6 32,35.8 45,26.6" fill="none" stroke="#FFFFFF" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
 </g>
 <path d="M766.64 285.76000000000005H648.3199999999999L766.64 228.64000000000004V174.40000000000003H536.0V226.24H660.8L536.0 285.76000000000005V337.6H766.64Z M788.24 337.6C855.6800000000001 337.6 923.36 337.6 991.04 337.6V289.36H858.56V275.20000000000005H979.76V237.04000000000002C939.44 237.04000000000002 898.88 237.04000000000002 858.56 237.04000000000002V222.64000000000004C895.76 222.64000000000004 976.88 222.64000000000004 991.04 222.64000000000004V174.40000000000003C923.36 174.40000000000003 855.6800000000001 174.40000000000003 788.24 174.40000000000003Z M1082.48 242.56000000000003 1176.32 337.6C1200.8 337.6 1225.28 337.6 1250.0 337.6V174.40000000000003H1179.44V257.92L1091.36 174.40000000000003H1012.16V337.6H1082.48Z M1512.32 174.40000000000003C1432.3999999999999 174.40000000000003 1352.48 174.40000000000003 1272.8 174.40000000000003V228.16000000000003C1289.12 228.16000000000003 1321.28 228.16000000000003 1357.28 227.92000000000002V337.6H1427.6V227.92000000000002H1512.32Z" fill="#000000" stroke="#000000" stroke-width="5.28" stroke-linejoin="round" stroke-linecap="round"/>
 </svg>

@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="zenoku app icon">
 <title>zenoku app icon</title>
 <rect width="1024" height="1024" rx="229" fill="#FFFFFF"/>
-<g transform="translate(512 512) scale(12.4) translate(-32 -32)">
-<circle cx="32" cy="32" r="22" fill="none" stroke="#000000" stroke-width="4"/>
-<circle cx="32" cy="32" r="4.4" fill="#000000"/>
+<g transform="translate(512 512) scale(10.8) translate(-32 -32)">
+<circle cx="32" cy="32" r="19" fill="none" stroke="#000000" stroke-width="3.2"/>
+<circle cx="32" cy="32" r="4.0" fill="#000000"/>
 </g>
 </svg>

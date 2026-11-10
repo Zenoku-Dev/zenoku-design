@@ -1,7 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 215 64" role="img" aria-label="zent logo">
 <title>zent</title>
-<path d="M 53.25 26.31 A 22 22 0 1 1 37.69 10.75" fill="none" stroke="#000000" stroke-width="4" stroke-linecap="round"/>
-<rect x="16.5" y="23.5" width="31" height="17.5" rx="3.4" fill="none" stroke="#000000" stroke-width="4"/>
-<polyline points="19,26.6 32,35.8 45,26.6" fill="none" stroke="#000000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M 50.35 27.08 A 19 19 0 1 1 36.92 13.65" fill="none" stroke="#000000" stroke-width="3.2" stroke-linecap="round"/>
+<g transform="translate(32 32) scale(0.76) translate(-32 -32)">
+<rect x="16.5" y="23.5" width="31" height="17.5" rx="3.4" fill="none" stroke="#000000" stroke-width="3.2"/>
+<polyline points="19,26.6 32,35.8 45,26.6" fill="none" stroke="#000000" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
 <path d="M107.869 35.635999999999996H93.572L107.869 28.733999999999998V22.179999999999996H80.0V28.443999999999996H95.08L80.0 35.635999999999996V41.9H107.869Z M110.479 41.9C118.628 41.9 126.806 41.9 134.984 41.9V36.071H118.976V34.36H133.621V29.749C128.749 29.749 123.848 29.749 118.976 29.749V28.009C123.471 28.009 133.273 28.009 134.984 28.009V22.179999999999996C126.806 22.179999999999996 118.628 22.179999999999996 110.479 22.179999999999996Z M146.03300000000002 30.415999999999997 157.372 41.9C160.33 41.9 163.288 41.9 166.275 41.9V22.179999999999996H157.749V32.272L147.106 22.179999999999996H137.536V41.9H146.03300000000002Z M197.972 22.179999999999996C188.315 22.179999999999996 178.65800000000002 22.179999999999996 169.03 22.179999999999996V28.676C171.002 28.676 174.888 28.676 179.238 28.647V41.9H187.735V28.647H197.972Z" fill="#000000" stroke="#000000" stroke-width="0.64" stroke-linejoin="round" stroke-linecap="round"/>
 </svg>

@@ -11,11 +11,12 @@
 
 | Знак | Проект | Что это |
 |---|---|---|
-| ![zenoku](assets/zenoku/png/app-icon-512.png) | **zenoku** | зонтичный бренд (`zenoku.host`) |
-| ![zeno](assets/zeno/png/app-icon-512.png) | **[zeno](https://github.com/rival-afk/zeno)** | локальный «VirusTotal»: хэши по открытым базам, движки ClamAV / YARA-X |
-| ![zent](assets/zent/png/app-icon-512.png) | **[zent](https://github.com/rival-afk/zent)** | «Zenoku Post»: свой SMTP/POP3/IMAP на Rust, антиспам-нейронка |
-| ![rsh](assets/rsh/png/app-icon-512.png) | **[rsh](https://github.com/rival-afk/rsh)** | удалённая оболочка: SSH через auth → VPS → туннель → ПК |
-| ![auth](assets/auth/png/app-icon-512.png) | **[auth](https://github.com/rival-afk/auth)** | rival-auth: единая авторизация (API, PAM, SSH keys) |
+| ![zenoku](assets/zenoku/png/app-icon-512.png) | **[zenoku](https://github.com/Zenoku-Dev)** | зонтичный бренд (`zenoku.host`) |
+| ![zeno](assets/zeno/png/app-icon-512.png) | **[zeno](https://github.com/Zenoku-Dev/zeno)** | локальный «VirusTotal»: хэши по открытым базам, движки ClamAV / YARA-X |
+| ![zent](assets/zent/png/app-icon-512.png) | **[zent](https://github.com/Zenoku-Dev/zent)** | «Zenoku Post»: свой SMTP/POP3/IMAP на Rust, антиспам-нейронка |
+| ![rsh](assets/rsh/png/app-icon-512.png) | **[rsh](https://github.com/Zenoku-Dev/rsh)** | удалённая оболочка: SSH через auth → VPS → туннель → ПК |
+| ![auth](assets/auth/png/app-icon-512.png) | **[auth](https://github.com/Zenoku-Dev/auth)** | rival-auth: единая авторизация (API, PAM, SSH keys) |
+| ![zenoku-dev](assets/zenoku-dev/png/app-icon-512.png) | **[Zenoku-Dev](https://github.com/Zenoku-Dev)** | организация: вся разработка zenoku |
 
 ## Галерея
 
@@ -28,6 +29,21 @@
 | **zent** | <picture><source media="(prefers-color-scheme: dark)" srcset="assets/zent/mark-on-dark.svg"><img src="assets/zent/mark.svg" width="96" alt="zent mark"></picture> | <picture><source media="(prefers-color-scheme: dark)" srcset="assets/zent/logo-dark.svg"><img src="assets/zent/logo.svg" width="260" alt="zent logo"></picture> | <img src="assets/zent/app-icon.svg" width="96" alt="zent app icon"> |
 | **rsh** | <picture><source media="(prefers-color-scheme: dark)" srcset="assets/rsh/mark-on-dark.svg"><img src="assets/rsh/mark.svg" width="96" alt="rsh mark"></picture> | <picture><source media="(prefers-color-scheme: dark)" srcset="assets/rsh/logo-dark.svg"><img src="assets/rsh/logo.svg" width="260" alt="rsh logo"></picture> | <img src="assets/rsh/app-icon.svg" width="96" alt="rsh app icon"> |
 | **auth** | <picture><source media="(prefers-color-scheme: dark)" srcset="assets/auth/mark-on-dark.svg"><img src="assets/auth/mark.svg" width="96" alt="auth mark"></picture> | <picture><source media="(prefers-color-scheme: dark)" srcset="assets/auth/logo-dark.svg"><img src="assets/auth/logo.svg" width="260" alt="auth logo"></picture> | <img src="assets/auth/app-icon.svg" width="96" alt="auth app icon"> |
+| **zenoku-dev** | <picture><source media="(prefers-color-scheme: dark)" srcset="assets/zenoku-dev/mark-on-dark.svg"><img src="assets/zenoku-dev/mark.svg" width="96" alt="zenoku-dev mark"></picture> | <picture><source media="(prefers-color-scheme: dark)" srcset="assets/zenoku-dev/logo-dark.svg"><img src="assets/zenoku-dev/logo.svg" width="260" alt="zenoku-dev logo"></picture> | <img src="assets/zenoku-dev/app-icon.svg" width="96" alt="zenoku-dev app icon"> |
+
+## Организация
+
+[**Zenoku-Dev**](https://github.com/Zenoku-Dev) — организация, где живёт вся разработка zenoku
+(`zenoku`, `zeno`, `zent`, `rsh`, `auth`, `zenoku-design`). Знак: дуга + `</>` — код семейства.
+Аватар организации ставится вручную: Settings → Organization profile → Profile picture,
+файл `assets/zenoku-dev/png/app-icon-1024.png`.
+
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="assets/zenoku-dev/readme-banner-dark.svg">
+    <img src="assets/zenoku-dev/readme-banner.svg" alt="zenoku-dev" width="560">
+  </picture>
+</p>
 
 ## Состав
 
@@ -49,7 +65,7 @@ assets/motion/
 └── sting-*.mp4        # стинги знака: 1080×1080, 30 fps (zenoku, zeno, zent, rsh, auth, family)
 ```
 
-продукты: `zenoku`, `zeno`, `zent`, `rsh`, `auth`.
+продукты: `zenoku`, `zeno`, `zent`, `rsh`, `auth` · организация: `zenoku-dev`.
 
 ## Бренд одним абзацем
 
@@ -72,7 +88,8 @@ SVG полностью самодостаточны: wordmark — это кри�
 ## Пересборка
 
 ```sh
-./scripts/render.sh          # python3 + rsvg-convert; пересобирает SVG и все PNG
+./scripts/render.sh          # python3 + rsvg-convert; пересобирает SVG и все PNG,
+                             # копирует PNG в ~/intemp/zenoku-design/<продукт>/ (drop-папка)
 python3 scripts/generate_motion.py   # анимированные README-баннеры
 python3 scripts/render_sting.py      # MP4-стинги в assets/motion/ (rsvg-convert + ffmpeg)
 ```

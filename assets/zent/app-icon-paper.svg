@@ -1,9 +1,11 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" role="img" aria-label="zent app icon">
 <title>zent app icon</title>
 <rect width="1024" height="1024" rx="229" fill="#FFFFFF"/>
-<g transform="translate(512 512) scale(12.4) translate(-32 -32)">
-<path d="M 53.25 26.31 A 22 22 0 1 1 37.69 10.75" fill="none" stroke="#000000" stroke-width="4" stroke-linecap="round"/>
-<rect x="16.5" y="23.5" width="31" height="17.5" rx="3.4" fill="none" stroke="#000000" stroke-width="4"/>
-<polyline points="19,26.6 32,35.8 45,26.6" fill="none" stroke="#000000" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+<g transform="translate(512 512) scale(10.8) translate(-32 -32)">
+<path d="M 50.35 27.08 A 19 19 0 1 1 36.92 13.65" fill="none" stroke="#000000" stroke-width="3.2" stroke-linecap="round"/>
+<g transform="translate(32 32) scale(0.76) translate(-32 -32)">
+<rect x="16.5" y="23.5" width="31" height="17.5" rx="3.4" fill="none" stroke="#000000" stroke-width="3.2"/>
+<polyline points="19,26.6 32,35.8 45,26.6" fill="none" stroke="#000000" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"/>
+</g>
 </g>
 </svg>
