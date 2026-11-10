@@ -1,15 +1,20 @@
 #!/usr/bin/env python3
-"""Генератор motion-версий README-баннеров zenoku.
+"""Генератор motion-версий README-баннеров zenoku (DESIGN 1.4).
 
-Один приём на знак (лого-скилл: draw-on для линейных знаков):
+Один приём на знак (logo-animation: draw-on для линейных знаков):
 дуга → глиф → точка (zenoku) → wordmark. База = финальный кадр бренда,
-CSS-анимации играют один раз и заканчиваются на нём; при отсутствии
-поддержки CSS/SMIL и при prefers-reduced-motion виден чистый знак.
+CSS играет один раз и заканчивается на нём; без CSS и при
+prefers-reduced-motion виден чистый знак 1.4.
+
+Геометрия не хардкодится: длины штрихов вычисляются численно из тех же
+строк, что рисует generate_svg.py, поэтому знаки всегда совпадают.
 
 Запускать из корня репо: python3 scripts/generate_motion.py
-PNG/MP4-рендер — scripts/render_sting.py + scripts/render.sh.
+Пост-валидация (XML + дубликаты атрибутов) встроена в main().
 """
+import math
 import os
+import re
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
@@ -19,11 +24,139 @@ EASE_DRAW = "cubic-bezier(.65,0,.35,1)"   # easeInOutCubic — ход штрих
 EASE_OUT = "cubic-bezier(.22,1,.36,1)"    # easeOutQuint — появления
 
 
-LENGTHS = {"arc": 115.19, "ring": 138.23, "shield": 85.45,
-           "zent_rect": 91.16, "zent_poly": 31.85,
-           "auth_circle": 38.96, "auth_line": 11.2,
-           "rsh_poly": 21.64, "rsh_line": 9.8}
+# ---------- числовая длина контуров ----------
 
+def _cubic_len(p0, p1, p2, p3, n=96):
+    pts = []
+    for i in range(n + 1):
+        t = i / n
+        mt = 1 - t
+        x = mt**3 * p0[0] + 3 * mt**2 * t * p1[0] + 3 * mt * t**2 * p2[0] + t**3 * p3[0]
+        y = mt**3 * p0[1] + 3 * mt**2 * t * p1[1] + 3 * mt * t**2 * p2[1] + t**3 * p3[1]
+        pts.append((x, y))
+    return sum(math.dist(pts[i], pts[i + 1]) for i in range(n))
+
+
+def _arc_length(d):
+    m = re.match(r"M\s*([\-\d.]+)\s+([\-\d.]+)\s+A\s*([\-\d.]+)\s+([\-\d.]+)\s+0\s+(\d)\s+(\d)\s+([\-\d.]+)\s+([\-\d.]+)", d)
+    if not m:
+        return None
+    x1, y1, rx, ry, large, _sweep, x2, y2 = (float(v) for v in m.groups())
+    r = rx
+    chord = math.dist((x1, y1), (x2, y2))
+    theta = 2 * math.asin(min(chord / (2 * r), 1.0))
+    if int(large):
+        theta = 2 * math.pi - theta
+    return r * theta
+
+
+_TOKEN = re.compile(r"([MLVCHZ])|(-?\d+(?:\.\d+)?)")
+
+
+def _path_length(d):
+    arc = _arc_length(d)
+    if arc is not None:
+        return arc
+    toks = [(a or b) for a, b in _TOKEN.findall(d)]
+    i = 0
+    cur = None
+    start = None
+    total = 0.0
+    cmd = None
+
+    def num():
+        nonlocal i
+        v = float(toks[i])
+        i += 1
+        return v
+
+    while i < len(toks):
+        if re.fullmatch(r"[MLVCHZ]", toks[i]):
+            cmd = toks[i]
+            i += 1
+            continue
+        if cmd == "M":
+            x, y = num(), num()
+            cur = (x, y)
+            start = cur
+            cmd = "L"  # последующие пары в M — это L
+        elif cmd == "L":
+            x, y = num(), num()
+            total += math.dist(cur, (x, y))
+            cur = (x, y)
+        elif cmd == "V":
+            y = num()
+            total += abs(y - cur[1])
+            cur = (cur[0], y)
+        elif cmd == "H":
+            x = num()
+            total += abs(x - cur[0])
+            cur = (x, cur[1])
+        elif cmd == "C":
+            p1, p2, p3 = (num(), num()), (num(), num()), (num(), num())
+            total += _cubic_len(cur, p1, p2, p3)
+            cur = p3
+        elif cmd == "Z":
+            total += math.dist(cur, start)
+            cur = start
+        else:
+            raise ValueError("unsupported path cmd %r in %r" % (cmd, d))
+    return total
+
+
+def _shape_length(tag):
+    m = re.match(r"<(\w+)", tag)
+    el = m.group(1)
+    if el == "path":
+        d = re.search(r'\sd="([^"]+)"', tag).group(1)
+        return _path_length(d)
+    if el == "rect":
+        x = float(re.search(r'\sx="([\-\d.]+)"', tag).group(1))
+        y = float(re.search(r'\sy="([\-\d.]+)"', tag).group(1))
+        w = float(re.search(r'\swidth="([\-\d.]+)"', tag).group(1))
+        h = float(re.search(r'\sheight="([\-\d.]+)"', tag).group(1))
+        rxm = re.search(r'\srx="([\-\d.]+)"', tag)
+        rx = float(rxm.group(1)) if rxm else 0.0
+        return 2 * (w + h - 4 * rx) + 2 * math.pi * rx
+    if el == "circle":
+        r = float(re.search(r'\sr="([\-\d.]+)"', tag).group(1))
+        return 2 * math.pi * r
+    if el == "line":
+        x1 = float(re.search(r'\sx1="([\-\d.]+)"', tag).group(1))
+        y1 = float(re.search(r'\sy1="([\-\d.]+)"', tag).group(1))
+        x2 = float(re.search(r'\sx2="([\-\d.]+)"', tag).group(1))
+        y2 = float(re.search(r'\sy2="([\-\d.]+)"', tag).group(1))
+        return math.dist((x1, y1), (x2, y2))
+    if el == "polyline":
+        pts = re.search(r'points="([^"]+)"', tag).group(1).split()
+        pts = [tuple(float(n) for n in p.split(",")) for p in pts]
+        return sum(math.dist(pts[i], pts[i + 1]) for i in range(len(pts) - 1))
+    raise ValueError("unsupported shape %r" % el)
+
+
+_SHAPE = re.compile(r"<(?:path|rect|polyline|line|circle)\b[^>]*>")
+
+
+def _annotate(fragment, delay_start, delay_step):
+    """Оборачивает каждый контур класса .draw2 с реальным --len и сдвигом."""
+    out = []
+    pos = 0
+    idx = 0
+    for m in _SHAPE.finditer(fragment):
+        out.append(fragment[pos:m.start()])
+        tag = m.group(0)
+        length = _shape_length(tag)
+        delay = delay_start + idx * delay_step
+        style = f"--len:{length:.2f};animation-delay:{delay:.2f}s"
+        tag = tag[:-2].rstrip() + f' class="draw2" style="{style}"/>'
+        out.append(tag)
+        pos = m.end()
+        idx += 1
+    out.append(fragment[pos:])
+    return "".join(out)
+
+
+# ---------- SVG: анимированные баннеры ----------
 
 def style_block():
     return f"""<style>
@@ -39,34 +172,17 @@ def style_block():
 """
 
 
-def animated_body(product, color):
-    """Знак с CSS-классами движения. База = финальный кадр."""
-    arc = (
-        f'<path class="draw" style="--len:115.19" d="{G.ARC}" fill="none" '
-        f'stroke="{color}" stroke-width="{G.SW}" stroke-linecap="round"/>'
-    )
+def animated_mark(product, color):
     if product == "zenoku":
-        return (
-            f'<circle class="draw" style="--len:138.23" cx="{G.C}" cy="{G.C}" r="{G.R}" '
-            f'fill="none" stroke="{color}" stroke-width="{G.SW}"/>\n'
-            f'<g class="dot"><circle cx="{G.C}" cy="{G.C}" r="4.4" fill="{color}"/></g>'
-        )
-    glyphs = {
-        "zeno": f'<path class="draw2" style="--len:85.45" d="M 32 17 L 43.2 21.1 V 30.2 C 43.2 38.7 39.3 44 32 47.1 C 24.7 44 20.8 38.7 20.8 30.2 V 21.1 Z" fill="none" stroke="{color}" stroke-width="{G.SW}" stroke-linejoin="round"/>',
-        "zent": (
-            f'<rect class="draw2" style="--len:91.16" x="16.5" y="23.5" width="31" height="17.5" rx="3.4" fill="none" stroke="{color}" stroke-width="{G.SW}"/>\n'
-            f'<polyline class="draw2" style="--len:31.85" points="19,26.6 32,35.8 45,26.6" fill="none" stroke="{color}" stroke-width="{G.SW}" stroke-linecap="round" stroke-linejoin="round" style="animation-delay:.55s"/>'
-        ),
-        "auth": (
-            f'<circle class="draw2" style="--len:38.96" cx="32" cy="25.2" r="6.2" fill="none" stroke="{color}" stroke-width="{G.SW}"/>\n'
-            f'<line class="draw2" style="--len:11.2" x1="32" y1="30.4" x2="32" y2="41.6" stroke="{color}" stroke-width="{G.SW}" stroke-linecap="round" style="animation-delay:.58s"/>'
-        ),
-        "rsh": (
-            f'<polyline class="draw2" style="--len:21.64" points="20.8,24.2 28.6,31.7 20.8,39.2" fill="none" stroke="{color}" stroke-width="{G.SW}" stroke-linecap="round" stroke-linejoin="round"/>\n'
-            f'<line class="draw2" style="--len:9.8" x1="33.2" y1="39.2" x2="43.0" y2="39.2" stroke="{color}" stroke-width="{G.SW}" stroke-linecap="round" style="animation-delay:.58s"/>'
-        ),
-    }
-    return arc + "\n" + glyphs[product]
+        ring_len = 2 * math.pi * G.R
+        return (f'<circle class="draw" style="--len:{ring_len:.2f}" '
+                f'cx="{G.C}" cy="{G.C}" r="{G.R}" fill="none" stroke="{color}" stroke-width="{G.SW}"/>' + "\n" +
+                f'<g class="dot"><circle cx="{G.C}" cy="{G.C}" r="4.0" fill="{color}"/></g>')
+    arc = (f'<path class="draw" style="--len:{_path_length(G.ARC):.2f}" d="{G.ARC}" '
+           f'fill="none" stroke="{color}" stroke-width="{G.SW}" stroke-linecap="round"/>')
+    glyph = _annotate(G.GLYPHS[product](color, color), 0.50, 0.07)
+    inner = arc + "\n" + f'<g transform="translate({G.C} {G.C}) scale({G.GS}) translate(-{G.C} -{G.C})">\n{glyph}\n</g>'
+    return inner
 
 
 def animated_banner_svg(product, variant):
@@ -79,18 +195,30 @@ def animated_banner_svg(product, variant):
     glyph_scale = G.BANNER_TILE / 64 * 0.775
     baseline = round(G.BANNER_H / 2 + G.BANNER_EM * G.x_height_ratio() / 2, 1)
     wordmark, advance = G.text_to_path(name, G.BANNER_TEXT_X, baseline, G.BANNER_EM, text)
-    # оборачиваем wordmark-path классом .word (первый элемент пути — class)
     wordmark = wordmark.replace("<path ", '<path class="word" ', 1)
     width = int(G.BANNER_TEXT_X + advance + G.BANNER_PAD)
     return f'''<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 {width} {G.BANNER_H}" role="img" aria-label="{name} banner">
 <title>{name}</title>
 {style_block()}<rect x="{G.BANNER_PAD}" y="{G.BANNER_PAD}" width="{G.BANNER_TILE}" height="{G.BANNER_TILE}" rx="93" fill="{tile}"/>
 <g transform="translate({tile_c} {tile_c}) scale({glyph_scale:.4f}) translate(-32 -32)">
-{animated_body(product, glyph)}
+{animated_mark(product, glyph)}
 </g>
 {wordmark}
 </svg>
 '''
+
+
+def _validate(path, src):
+    import xml.etree.ElementTree as ET
+    try:
+        ET.fromstring(src)
+    except ET.ParseError as e:
+        raise SystemExit(f"invalid SVG {path}: {e}")
+    for m in re.finditer(r"<[^>]+>", src):
+        attrs = re.findall(r"\s([a-zA-Z-]+)=", m.group(0))
+        dup = {a for a in attrs if attrs.count(a) > 1}
+        if dup:
+            raise SystemExit(f"duplicate attribute(s) {dup} in {path}: {m.group(0)[:120]}")
 
 
 def main():
@@ -101,8 +229,10 @@ def main():
         for variant, fname in (("light", "readme-banner-animated.svg"),
                                ("dark", "readme-banner-animated-dark.svg")):
             path = os.path.join(d, fname)
+            src = animated_banner_svg(product, variant)
+            _validate(path, src)
             with open(path, "w") as f:
-                f.write(animated_banner_svg(product, variant))
+                f.write(src)
             print("wrote", path)
 
 
